@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MvcTestingExampleApplication<spring-boot-mvc-testing-demo>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.luv2code.springmvc.MvcTestingExampleApplication",
+            "projectName": "spring-boot-mvc-testing-demo",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
