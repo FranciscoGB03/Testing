@@ -1,9 +1,11 @@
 package com.luv2code.springmvc;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -130,6 +132,22 @@ class GradebookControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)));
 
+    }
+
+    @Test
+    void createStudentHttpRequest() throws Exception {
+        student.setFirstname("Francisco");
+        student.setLastname("Gonzalez");
+        student.setEmailAddress("francisco.gonzalez@pgonbo.com");
+
+        mockMvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(student)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
+
+        CollegeStudent verifyStudent=studentDao.findByEmailAddress("francisco.gonzalez@pgonbo.com");
+        assertNotNull(verifyStudent,"Student should be valid.");
     }
 
     @AfterEach
