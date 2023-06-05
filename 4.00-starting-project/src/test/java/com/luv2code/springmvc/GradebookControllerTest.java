@@ -34,7 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.luv2code.springmvc.models.CollegeStudent;
+import com.luv2code.springmvc.models.HistoryGrade;
 import com.luv2code.springmvc.models.MathGrade;
+import com.luv2code.springmvc.models.ScienceGrade;
 import com.luv2code.springmvc.repository.HistoryGradesDao;
 import com.luv2code.springmvc.repository.MathGradesDao;
 import com.luv2code.springmvc.repository.ScienceGradesDao;
@@ -69,9 +71,6 @@ class GradebookControllerTest {
 
     @Autowired
     private HistoryGradesDao historyGradeDao;
-
-    @Autowired
-    private StudentAndGradeService studentService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -267,12 +266,56 @@ class GradebookControllerTest {
     }
 
     @Test
-    void deleteAValidGradeHttpRequestStudentIdDoesNotExistEmptyResponse() throws Exception{
+    void deleteAValidGradeScienceHttpRequest() throws Exception {
+
+        Optional<ScienceGrade> scienceGrade = scienceGradeDao.findById(1);
+
+        assertTrue(scienceGrade.isPresent());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/grades/{id}/{gradeType}", 1, "science"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.firstname", is("Eric")))
+                .andExpect(jsonPath("$.lastname", is("Roby")))
+                .andExpect(jsonPath("$.emailAddress", is("eric.roby@luv2code_school.com")))
+                .andExpect(jsonPath("$.studentGrades.scienceGradeResults", hasSize(0)));
+
+    }
+
+    @Test
+    void deleteAValidGradeHistoryHttpRequest() throws Exception {
+
+        Optional<HistoryGrade> historyGrade = historyGradeDao.findById(1);
+
+        assertTrue(historyGrade.isPresent());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/grades/{id}/{gradeType}", 1, "history"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.firstname", is("Eric")))
+                .andExpect(jsonPath("$.lastname", is("Roby")))
+                .andExpect(jsonPath("$.emailAddress", is("eric.roby@luv2code_school.com")))
+                .andExpect(jsonPath("$.studentGrades.historyGradeResults", hasSize(0)));
+
+    }
+
+    @Test
+    void deleteAValidGradeHttpRequestStudentIdDoesNotExistEmptyResponse() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/grades/{id}/{gradeType}", 2, "history"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.status", is(404)))
                 .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
 
+    }
+
+    @Test
+    void deleteANonValidGradeHttpRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/grades/{id}/{gradeType}", 1, "literature"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.status", is(404)))
+                .andExpect(jsonPath("$.message", is("Student or Grade was not found")));
     }
 
     @AfterEach
